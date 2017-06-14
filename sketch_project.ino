@@ -1,9 +1,14 @@
 #include <LTask.h>
 #include <LGSM.h>
 const int pinLed = 13;
+char phone_number_list[5][20];
+int top_phone = 0;
+void handleMsg(char dtaget[], char p_num[]){
+  if(strcmp(dtaget,"set num")){
+      strncpy(phone_number_list[top_phone],p_num,20);
+      top_phone ++;
+    }
 
-void handleMsg(String dtaget){
-  if(dtaget == "set")
 }
 
 void setup() {
@@ -17,9 +22,9 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  String p_num;
+  char p_num[20];
   int len = 0;
-  String dtaget;
+  char dtaget[500];
 //  Serial.println(LSMS.available());
   if(LSMS.available()){
     LSMS.remoteNumber(p_num,20);
@@ -35,7 +40,7 @@ void loop() {
 
 
     } 
-    handleMsg(staget, p_num)
+    dtaget[len] = 0;
     Serial.println(dtaget); 
     LSMS.flush();
   }
