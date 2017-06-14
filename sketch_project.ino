@@ -12,7 +12,7 @@ int top_phone = 0;
 String str_buffer;
 void sendMsg(char p_num[], String msg);
 bool test = 1;
-int time = 1000;
+int mytime = 1000;
 
 static void sendMsgToAllContacts(String msg){
   for(int i = 0; i<2; i++){
@@ -136,7 +136,7 @@ void handleMsg(char dtaget[], char p_num[]){
       piece = strtok(NULL,"\n");
       if(i<=1)
         strcpy(phone_number_list[i],piece);
-      else time = atoi(piece);
+      else mytime = atoi(piece)*1000;
     }  
   }
 }
@@ -156,14 +156,17 @@ void setup() {
   Serial.begin(9600);
   LGPS.powerOn();//gps setting
   Serial.println("LGPS power on, and waiting");
-  /*
+  
   while(!LSMS.ready()){
     delay(100);  
-  }*/
+  }
   Serial.println("GSM OK!!");
+  pinMode(4,INPUT);
+  pinMode(13,OUTPUT);
 }
 
 void sendgpsInfo(){
+  LGPS.powerOn();
   LGPS.getData(&info);
   parseGPGGA((const char*)info.GPGGA);
 }
@@ -171,7 +174,20 @@ void printSettingInfo(){
   Serial.println(phone_number_list[0]);
   Serial.println(phone_number_list[1]);
 }
+int timer = 0;
 void loop() {
+  timer ++;
+  int switc = digitalRead(4);
+  Serial.println(switc);
+  if(switc){
+    digitalWrite(13,LOW);
+    if(timer >= mytime){
+      sendgpsInfo();
+      timer = 0;
+    }
+  }else{
+    digitalWrite(13,HIGH);
+  }
   // put your main code here, to run repeatedly:
   char p_num[20];
   int len = 0;
