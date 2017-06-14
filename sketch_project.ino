@@ -1,6 +1,11 @@
 #include <LTask.h>
 #include <LGSM.h>
 const int pinLed = 13;
+
+void handleMsg(String dtaget){
+  if(dtaget == "set")
+}
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -12,9 +17,9 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  char p_num[20];
+  String p_num;
   int len = 0;
-  char dtaget[500];
+  String dtaget;
 //  Serial.println(LSMS.available());
   if(LSMS.available()){
     LSMS.remoteNumber(p_num,20);
@@ -30,8 +35,10 @@ void loop() {
 
 
     } 
-    dtaget[len] = 0;
+    handleMsg(staget, p_num)
     Serial.println(dtaget); 
     LSMS.flush();
   }
 }
+
+
