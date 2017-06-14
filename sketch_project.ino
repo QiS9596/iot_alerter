@@ -157,9 +157,9 @@ void setup() {
   LGPS.powerOn();//gps setting
   Serial.println("LGPS power on, and waiting");
   
-  while(!LSMS.ready()){
-    delay(100);  
-  }
+  //while(!LSMS.ready()){
+  //  delay(100);  
+  //}
   Serial.println("GSM OK!!");
   pinMode(4,INPUT);
   pinMode(13,OUTPUT);
@@ -181,11 +181,12 @@ void loop() {
   Serial.println(switc);
   if(switc){
     digitalWrite(13,LOW);
+
+  }else{
     if(timer >= mytime){
       sendgpsInfo();
       timer = 0;
     }
-  }else{
     digitalWrite(13,HIGH);
   }
   // put your main code here, to run repeatedly:
