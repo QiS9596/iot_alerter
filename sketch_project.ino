@@ -12,7 +12,7 @@ int top_phone = 0;
 String str_buffer;
 void sendMsg(char p_num[], String msg);
 bool test = 1;
-int mytime = 1000;
+int mytime = 200;
 
 static void sendMsgToAllContacts(String msg){
   for(int i = 0; i<2; i++){
@@ -117,7 +117,7 @@ void parseGPGGA(const char* GPGGAstr)
     num = getIntNumber(&GPGGAstr[tmp]);    
     sprintf(buff, "satellites number = %d", num);
     Serial.println(buff);
-    sprintf(message,buff); 
+    //sprintf(message,buff); 
     sendMsgToAllContacts(message);
   }
   else
@@ -131,17 +131,19 @@ void handleMsg(char dtaget[], char p_num[]){
 
   char * piece;
   piece = strtok(dtaget,"\n");
+  //setting new contact number
   if(!strcmp(piece,"[setting]")){
     for(int i = 0; i < 3; i++){
       piece = strtok(NULL,"\n");
       if(i<=1)
         strcpy(phone_number_list[i],piece);
-      else mytime = atoi(piece)*1000;
+      else mytime = atoi(piece);
     }  
   }
 }
 
 void sendMsg(char p_num[], String msg){
+  
   LSMS.beginSMS(p_num);
   LSMS.print(msg);
   if(LSMS.endSMS()){
@@ -157,11 +159,13 @@ void setup() {
   LGPS.powerOn();//gps setting
   Serial.println("LGPS power on, and waiting");
   
-  //while(!LSMS.ready()){
-  //  delay(100);  
-  //}
+  /*while(!LSMS.ready()){
+    Serial.println("GSM waiting");
+    delay(100);  
+  }*/
   Serial.println("GSM OK!!");
   pinMode(4,INPUT);
+  digitalWrite(4,LOW);
   pinMode(13,OUTPUT);
 }
 
@@ -176,26 +180,32 @@ void printSettingInfo(){
 }
 int timer = 0;
 void loop() {
+  //timer for sending gps infomation
   timer ++;
+  //switch
   int switc = digitalRead(4);
-  Serial.println(switc);
-  if(switc){
+//  Serial.println(switc);
+  digitalWrite(13,HIGH);
+  if(!switc){
     digitalWrite(13,LOW);
-
+    //Serial.println("set led to low");
   }else{
     if(timer >= mytime){
       sendgpsInfo();
       timer = 0;
     }
     digitalWrite(13,HIGH);
+    //Serial.println("set led to high");
   }
+
   // put your main code here, to run repeatedly:
-  char p_num[20];
+  char p_num[20];//used to store input phone number
   int len = 0;
-  char dtaget[500];
+  char dtaget[500];//buffer to read message
 //  Serial.println(LSMS.available());
-  
-  printSettingInfo();
+  strcpy(phone_number_list[0],"0973117646");
+  //printSettingInfo();
+  //read message part
   if(LSMS.available()){
     LSMS.remoteNumber(p_num,20);
     Serial.println("There is new message.");
@@ -211,10 +221,13 @@ void loop() {
 
     } 
     dtaget[len] = 0;
-    handleMsg(dtaget,p_num);
+    //handle message
     Serial.println(dtaget); 
+    handleMsg(dtaget,p_num);
+
     LSMS.flush();
   }
+  delay(10);
 }
 
 
